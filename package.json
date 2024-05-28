@@ -2,11 +2,17 @@
   "name": "js_load_bal",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "load.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node load.js",
+    "server": "node index.js"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "http-proxy": "^1.18.1",
+    "run": "^1.5.0"
+  }
 }

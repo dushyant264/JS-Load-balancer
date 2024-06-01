@@ -5,15 +5,46 @@ const httpproxy = require('http-proxy')
 const proxy = httpproxy.createProxyServer({})
 
 const servers = [
-    { host: 'localhost', port: 3000, isActive: true },
-    { host: 'localhost', port: 3001, isActive: true },
-    { host: 'localhost', port: 3002, isActive: true },
-    { host: 'localhost', port: 3003, isActive: true }
+ 
 ];
 
 let activeservers = servers.slice()
 let currindex = -1
 const timeout = 2000
+
+/* Registry server */
+
+const registryServer = http.createServer((req, res)=>{
+    if(req.method==='POST'){
+        let body='';
+        req.on('data',(chunk)=>{body+=chunk.toString();});
+
+        req.on('end',()=> {
+            const serverInfo=JSON.parse(body);
+            const serverURL=new URL(`http://${serverInfo.host}:${serverInfo.port}`);
+
+            if(!servers.find(server=>server.host===serverURL.host&&server.port===serverURL.port)){
+                servers.push(serverInfo);
+                activeservers.push(serverInfo);
+                console.log(`Server ${serverURL} added to the registry`);
+                res.writeHead(200,{'Content-Type':'text/plain'});
+                res.end('Server added to the registry');
+            }
+            else{
+                res.writeHead(200,{'Content-Type':'text/plain'});
+                res.end('Server already registered');
+            }
+        });
+    } else{
+        res.writeHead(404,{'Content-Type':'text/plain'});
+        res.end('Invalid request');
+    }
+})
+
+/* registry server port */
+
+const registryPort=5174;
+registryServer.listen(registryPort,()=>{console.log(`Registry server started on port ${registryPort}`)})
 
 /* Health Check */
 function healthcheck() {
